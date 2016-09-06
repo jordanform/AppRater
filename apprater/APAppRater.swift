@@ -28,7 +28,7 @@ let AP_APP_RATING_SHOWN = "com.gittielabs.app_rating_shown"
     }
     
     func setup(){
-         NSNotificationCenter.defaultCenter().addObserver(self, selector: "appDidFinishLaunching:" , name: UIApplicationDidFinishLaunchingNotification, object: nil)
+         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(APAppRater.appDidFinishLaunching(_:)) , name: UIApplicationDidFinishLaunchingNotification, object: nil)
     }
     
     //MARK: - NSNotification Observers
@@ -47,7 +47,7 @@ let AP_APP_RATING_SHOWN = "com.gittielabs.app_rating_shown"
     
     func incrementAppLaunches(){
         var launches = userdefaults.integerForKey(AP_APP_LAUNCHES)
-        launches++
+        launches += 1
         userdefaults.setInteger(launches, forKey: AP_APP_LAUNCHES)
         userdefaults.synchronize()
     }
@@ -86,13 +86,9 @@ let AP_APP_RATING_SHOWN = "com.gittielabs.app_rating_shown"
     private func displayRatingsPromptIfRequired(){
         let appLaunchCount = getAppLaunchCount()
         if appLaunchCount >= self.requiredLaunchesBeforeRating {
-            if #available(iOS 8.0, *) {
-                // show App Ratings
-                rateTheApp()
-            }
-            else{
-               rateTheAppOldVersion()
-            }
+            
+            // show App Ratings
+            rateTheApp()            
         }
         
         incrementAppLaunches()
@@ -122,13 +118,6 @@ let AP_APP_RATING_SHOWN = "com.gittielabs.app_rating_shown"
             window.rootViewController?.presentViewController(rateAlert, animated: true, completion: nil)
         })
     
-    }
-    
-    private func rateTheAppOldVersion(){
-        let app_name = NSBundle(forClass: application.delegate!.dynamicType).infoDictionary!["CFBundleName"] as? String
-        let message = "Do you love the \(app_name!) app?  Please rate us!"
-        let alert = UIAlertView(title: "Rate Us", message: message, delegate: self, cancelButtonTitle: "Not Now", otherButtonTitles: "Rate Us")
-        alert.show()
     }
     
     //MARK: - Alert Views
